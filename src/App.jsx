@@ -1,53 +1,68 @@
 import { useState, useMemo } from "react";
+import Swal from "sweetalert2";
 import "./App.css";
 
 export default function App() {
-  const [text, setText] = useState("");
-  const [history, setHistory] = useState([]);
+  const [makeup, setMakeup] = useState("party");
+  const [event, setEvent] = useState("party");
+  const [people, setPeople] = useState(1);
 
-  const suggestions = useMemo(
-    () =>
-      history.filter((item) =>
-        item.toLowerCase().includes(text.toLowerCase())
-      ),
-    [text, history]
-  );
+  const totalPrice = useMemo(() => {
+    const makeupPrice = {
+      party: 50,
+      bridal: 150,
+      hd: 100,
+    };
 
-  const search = () => {
-    if (text && !history.includes(text)) {
-      setHistory([...history, text]);
-    }
+    const eventPrice = {
+      party: 20,
+      wedding: 40,
+      photoshoot: 30,
+    };
+
+    return (makeupPrice[makeup] + eventPrice[event]) * people;
+  }, [makeup, event, people]);
+
+  const handleBooking = () => {
+    Swal.fire({
+      title: "Booking Confirmed 💄",
+      text: `Your booking total is $${totalPrice}`,
+      icon: "success",
+      confirmButtonColor: "#ec4899",
+      confirmButtonText: "OK",
+    });
   };
 
   return (
     <div className="page">
-      <div className="search-card">
-        <h2 className="logo">Search</h2>
+      <div className="card">
+        <h2 className="title">Makeup Booking</h2>
 
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search here..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <button className="search-btn" onClick={search}>
-            Search
-          </button>
-          <button className="clear-btn" onClick={() => setText("")}>
-            Clear
-          </button>
-        </div>
+        <select className="input" onChange={(e) => setMakeup(e.target.value)}>
+          <option value="party">Party Makeup</option>
+          <option value="bridal">Bridal Makeup</option>
+          <option value="hd">HD Makeup</option>
+        </select>
 
-        {text && suggestions.map((item, i) => (
-          <div
-            key={i}
-            className="suggestion"
-            onClick={() => setText(item)}
-          >
-            {item}
-          </div>
-        ))}
+        <select className="input" onChange={(e) => setEvent(e.target.value)}>
+          <option value="party">Party Event</option>
+          <option value="wedding">Wedding</option>
+          <option value="photoshoot">Photoshoot</option>
+        </select>
+
+        <input
+          className="input"
+          type="number"
+          min="1"
+          value={people}
+          onChange={(e) => setPeople(Number(e.target.value))}
+        />
+
+        <h3 className="price">Total: ${totalPrice}</h3>
+
+        <button className="button" onClick={handleBooking}>
+          Book Now
+        </button>
       </div>
     </div>
   );
